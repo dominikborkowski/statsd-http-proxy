@@ -62,25 +62,6 @@ clean:
 	rm -rf ./bin
 	go clean
 
-# to publish to docker registry we need to be logged in
-docker-login:
-    ifdef DOCKER_REGISTRY_USERNAME
-		@echo "h" $(DOCKER_REGISTRY_USERNAME) "h"
-    else
-		docker login
-    endif
-
-# build docker images
-docker-build:
-	docker build --tag gometric/statsd-http-proxy:latest -f ./Dockerfile.alpine .
-	docker build --tag gometric/statsd-http-proxy:$(VERSION) -f ./Dockerfile.alpine .
-
-# publish docker images to hub
-docker-publish: docker-build
-	docker login
-	docker push gometric/statsd-http-proxy:latest
-	docker push gometric/statsd-http-proxy:$(VERSION)
-
 # run statsd proxy in http mode
 run-http:
 	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret --metric-prefix=prefix.subprefix
