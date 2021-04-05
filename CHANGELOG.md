@@ -1,6 +1,6 @@
 ## 0.10.0 (2021-04-05)
   * Default HTTP port changed to 8825
-  * Configure HTTP timeouts through `--`, `--http-timeout-write` and `--http-timeout-idle`
+  * Configure HTTP timeouts through `--http-timeout-read`, `--http-timeout-write` and `--http-timeout-idle`
   * Allow to configure router through `--http-router-name`
 
 ## 0.9 (2019-01-29)
