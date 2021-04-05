@@ -62,6 +62,10 @@ clean:
 	rm -rf ./bin
 	go clean
 
+# Install binary locally
+install:
+	cp $(CURDIR)/bin/statsd-http-proxy /usr/local/bin
+
 # run statsd proxy in http mode
 run-http:
 	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret --metric-prefix=prefix.subprefix
