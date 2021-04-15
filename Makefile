@@ -86,8 +86,14 @@ run-profiler-cli:
 run-profiler-web:
 	go tool pprof -http=localhost:6061 http://localhost:6060/debug/pprof/profile
 
+# show web interface with trace info
+# project must be run in profiler mode through "nake run-http-prof"
+run-trace:
+	curl "http://localhost:6060/debug/pprof/trace" > /tmp/statsd-http-proxt-trace
+	go tool trace /tmp/statsd-http-proxt-trace
+
 run-siege:
-	time siege -c 150 -r 150 -H 'Connection: close' -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+	time siege -c 150 -r 5000 -H 'Connection: close' -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
 
 run-wrk:
 	docker run --rm --network="host" -v $(CURDIR):/proxy williamyeh/wrk -c 1 -t 1 -d 20 -s /proxy/bench/wrk.lua http://127.0.0.1:8080/count/a.b.c.d
