@@ -1,3 +1,6 @@
+## 0.11.0 (2021-04-16)
+  * Use Cactus StatsD Client
+
 ## 0.10.0 (2021-04-05)
   * Default HTTP port changed to 8825
   * Configure HTTP timeouts through `--http-timeout-read`, `--http-timeout-write` and `--http-timeout-idle`
