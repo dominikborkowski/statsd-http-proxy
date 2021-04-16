@@ -55,7 +55,17 @@ func NewServer(
 	logger := log.New(logOutput, "", log.LstdFlags)
 
 	// create StatsD Client
-	statsdClient := statsdclient.NewGoMetricClient(statsdHost, statsdPort)
+	statsdClientName := "Cactus"
+
+	var statsdClient statsdclient.StatsdClientInterface
+	switch statsdClientName {
+	case "GoMetric":
+		statsdClient = statsdclient.NewGoMetricClient(statsdHost, statsdPort)
+	case "Cactus":
+		statsdClient = statsdclient.NewCactusClient(statsdHost, statsdPort)
+	default:
+		panic("Passed statsd client not supported")
+	}
 
 	// build route handler
 	routeHandler := routehandler.NewRouteHandler(
