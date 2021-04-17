@@ -68,6 +68,14 @@ func main() {
 		os.Exit(0)
 	}
 
+	// log build version
+	log.Printf(
+		"Starting StatsD HTTP Proxy v.%s, build %s from %s\n",
+		Version,
+		BuildNumber,
+		BuildDate,
+	)
+
 	// start profiler
 	if *profilerHTTPort > 0 {
 		// enable block profiling
