@@ -22,13 +22,14 @@ func TestNewServerWithGorillaMuxRouter(t *testing.T) {
 		"someTokenSecret",
 		true,
 		"GorillaMux",
+		"Cactus",
 	)
 
 	require.Equal(t, "*proxy.Server", reflect.TypeOf(proxyServer).String())
 
 	require.Equal(t, "127.0.0.1:8080", proxyServer.httpAddress)
 
-	require.Equal(t, "*statsd.Client", reflect.TypeOf(proxyServer.statsdClient).String())
+	require.Equal(t, "*statsdclient.CactusStatsdClientAdapter", reflect.TypeOf(proxyServer.statsdClient).String())
 
 	require.Equal(t, "tls.crt", proxyServer.tlsCert)
 
@@ -50,13 +51,14 @@ func TestNewServerWithHttpRouter(t *testing.T) {
 		"someTokenSecret",
 		true,
 		"HttpRouter",
+		"Cactus",
 	)
 
 	require.Equal(t, "*proxy.Server", reflect.TypeOf(proxyServer).String())
 
 	require.Equal(t, "127.0.0.1:8080", proxyServer.httpAddress)
 
-	require.Equal(t, "*statsd.Client", reflect.TypeOf(proxyServer.statsdClient).String())
+	require.Equal(t, "*statsdclient.CactusStatsdClientAdapter", reflect.TypeOf(proxyServer.statsdClient).String())
 
 	require.Equal(t, "tls.crt", proxyServer.tlsCert)
 
