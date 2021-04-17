@@ -1,3 +1,6 @@
+## 0.12.0 (2021-04-17)
+  * Use HttpRouter by default
+
 ## 0.11.0 (2021-04-16)
   * Use Cactus StatsD Client
 
