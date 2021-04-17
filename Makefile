@@ -68,11 +68,11 @@ install:
 
 # run statsd proxy in http mode
 run-http:
-	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret --metric-prefix=prefix.subprefix
+	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --metric-prefix=prefix.subprefix --jwt-secret=somesecret
 
 # run statsd proxy in http mode with profiling
 run-http-prof:
-	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret --metric-prefix=prefix.subprefix -profiler-http-port=6060
+	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --metric-prefix=prefix.subprefix --jwt-secret=somesecret -profiler-http-port=6060
 
 # run statsd mock that listen UPD port (for monitoring that proxy sends metrics to UPD)
 run-statsd-mock:
