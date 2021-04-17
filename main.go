@@ -50,14 +50,15 @@ func main() {
 	var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
 	var verbose = flag.Bool("verbose", false, "Verbose")
 	var version = flag.Bool("version", false, "Show version")
-	var httpRouterName = flag.String("http-router-name", "GorillaMux", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
+	var httpRouterName = flag.String("http-router-name", "HttpRouter", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
+	var statsdClientName = flag.String("statsd-client-name", "Cactus", "Type of StatsD client. Allowed values are Cactus and GoMetric. Do not use in production.")
 	var profilerHTTPort = flag.Int("profiler-http-port", 0, "Start profiler localhost")
 
 	// get flags
 	flag.Parse()
 
 	// show version and exit
-	if *version == true {
+	if *version {
 		fmt.Printf(
 			"StatsD HTTP Proxy v.%s, build %s from %s\n",
 			Version,
@@ -97,6 +98,7 @@ func main() {
 		*tokenSecret,
 		*verbose,
 		*httpRouterName,
+		*statsdClientName,
 	)
 
 	proxyServer.Listen()

@@ -41,6 +41,7 @@ func NewServer(
 	tokenSecret string,
 	verbose bool,
 	httpRouterName string,
+	statsdClientName string,
 ) *Server {
 	// configure logging
 	var logOutput io.Writer
@@ -55,14 +56,12 @@ func NewServer(
 	logger := log.New(logOutput, "", log.LstdFlags)
 
 	// create StatsD Client
-	statsdClientName := "Cactus"
-
 	var statsdClient statsdclient.StatsdClientInterface
 	switch statsdClientName {
-	case "GoMetric":
-		statsdClient = statsdclient.NewGoMetricClient(statsdHost, statsdPort)
 	case "Cactus":
 		statsdClient = statsdclient.NewCactusClient(statsdHost, statsdPort)
+	case "GoMetric":
+		statsdClient = statsdclient.NewGoMetricClient(statsdHost, statsdPort)
 	default:
 		panic("Passed statsd client not supported")
 	}
@@ -76,10 +75,11 @@ func NewServer(
 	// build router
 	var httpServerHandler http.Handler
 	switch httpRouterName {
-	case "GorillaMux":
-		httpServerHandler = router.NewGorillaMuxRouter(routeHandler, tokenSecret)
 	case "HttpRouter":
 		httpServerHandler = router.NewHTTPRouter(routeHandler, tokenSecret)
+	case "GorillaMux":
+		httpServerHandler = router.NewGorillaMuxRouter(routeHandler, tokenSecret)
+
 	default:
 		panic("Passed HTTP router not supported")
 	}
