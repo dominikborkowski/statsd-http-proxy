@@ -1,3 +1,6 @@
+## 0.12.1 (2021-04-27)
+  * Use GoMetric StatsD by default
+
 ## 0.12.0 (2021-04-17)
   * Use HttpRouter by default
 
