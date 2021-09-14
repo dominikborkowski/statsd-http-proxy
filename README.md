@@ -33,12 +33,20 @@ Requests may be optionally authenticated using JWT tokens.
 
 ## Installation
 
+### Build from sources
+
 ```
 git clone git@github.com:GoMetric/statsd-http-proxy.git
 make build
 ```
 
-Also available [Docker image](https://hub.docker.com/r/gometric/statsd-http-proxy/):
+### Build docker image
+
+Build your own docker image: https://github.com/GoMetric/statsd-http-proxy-docker
+
+### Official docker image
+
+Use [Docker image](https://hub.docker.com/r/gometric/statsd-http-proxy/):
 
 [![docker](https://img.shields.io/docker/pulls/gometric/statsd-http-proxy.svg?style=flat)](https://hub.docker.com/r/gometric/statsd-http-proxy/)
 
