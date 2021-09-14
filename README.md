@@ -50,11 +50,13 @@ Use [Docker image](https://hub.docker.com/r/gometric/statsd-http-proxy/):
 
 [![docker](https://img.shields.io/docker/pulls/gometric/statsd-http-proxy.svg?style=flat)](https://hub.docker.com/r/gometric/statsd-http-proxy/)
 
+Run by Docker with insecure connection:
+
 ```
 docker run -p 80:80 gometric/statsd-http-proxy:latest --verbose
 ```
 
-Secure connection:
+Run by Docker with secure connection:
 
 ```
 docker run -p 4433:4433 -v "$(pwd)":/certs/  gometric/statsd-http-proxy:latest --verbose --http-port=4433 --tls-cert=/certs/cert.pem --tls-key=/certs/key.pem
