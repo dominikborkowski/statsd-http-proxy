@@ -5,59 +5,50 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/GoMetric/statsd-http-proxy/proxy"
 )
 
-// Version is a current git commit hash and tag
-// Injected by compilation flag
-var Version = "Unknown"
+var (
+	// Version is a current git commit hash and tag
+	// Injected by compilation flag
+	Version = "Unknown"
 
-// BuildNumber is a current commit hash
-// Injected by compilation flag
-var BuildNumber = "Unknown"
+	// BuildNumber is a current commit hash
+	// Injected by compilation flag
+	BuildNumber = "Unknown"
 
-// BuildDate is a date of build
-// Injected by compilation flag
-var BuildDate = "Unknown"
-
-// HTTP connection params
-const defaultHTTPHost = "127.0.0.1"
-const defaultHTTPPort = 8825
-const defaultHTTPReadTimeout = 1
-const defaultHTTPWriteTimeout = 1
-const defaultHTTPIdleTimeout = 1
-
-// StatsD connection params
-const defaultStatsDHost = "127.0.0.1"
-const defaultStatsDPort = 8125
+	// BuildDate is a date of build
+	// Injected by compilation flag
+	BuildDate = "Unknown"
+)
 
 func main() {
-	// declare command line options
-	var httpHost = flag.String("http-host", defaultHTTPHost, "HTTP Host")
-	var httpPort = flag.Int("http-port", defaultHTTPPort, "HTTP Port")
-	var httpReadTimeout = flag.Int("http-timeout-read", defaultHTTPReadTimeout, "The maximum duration in seconds for reading the entire request, including the body")
-	var httpWriteTimeout = flag.Int("http-timeout-write", defaultHTTPWriteTimeout, "The maximum duration in seconds before timing out writes of the respons")
-	var httpIdleTimeout = flag.Int("http-timeout-idle", defaultHTTPIdleTimeout, "The maximum amount of time in seconds to wait for the next request when keep-alives are enabled")
-	var tlsCert = flag.String("tls-cert", "", "TLS certificate to enable HTTPS")
-	var tlsKey = flag.String("tls-key", "", "TLS private key  to enable HTTPS")
-	var statsdHost = flag.String("statsd-host", defaultStatsDHost, "StatsD Host")
-	var statsdPort = flag.Int("statsd-port", defaultStatsDPort, "StatsD Port")
-	var metricPrefix = flag.String("metric-prefix", "", "Prefix of metric name")
-	var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
-	var verbose = flag.Bool("verbose", false, "Verbose")
+	// Declare command line options
+	var httpHost = flag.String("http-host", getEnv("HTTP_HOST", "127.0.0.1"), "HTTP Host")
+	var httpPort = flag.Int("http-port", getEnvInt("HTTP_PORT", 8825), "HTTP Port")
+	var httpReadTimeout = flag.Int("http-timeout-read", getEnvInt("HTTP_TIMEOUT_READ", 1), "Read timeout in seconds")
+	var httpWriteTimeout = flag.Int("http-timeout-write", getEnvInt("HTTP_TIMEOUT_WRITE", 1), "Write timeout in seconds")
+	var httpIdleTimeout = flag.Int("http-timeout-idle", getEnvInt("HTTP_TIMEOUT_IDLE", 1), "Idle timeout in seconds")
+	var tlsCert = flag.String("tls-cert", getEnv("TLS_CERT", ""), "TLS certificate for HTTPS")
+	var tlsKey = flag.String("tls-key", getEnv("TLS_KEY", ""), "TLS private key for HTTPS")
+	var statsdHost = flag.String("statsd-host", getEnv("STATSD_HOST", "127.0.0.1"), "StatsD Host")
+	var statsdPort = flag.Int("statsd-port", getEnvInt("STATSD_PORT", 8125), "StatsD Port")
+	var metricPrefix = flag.String("metric-prefix", getEnv("METRIC_PREFIX", ""), "Metric name prefix")
+	var tokenSecret = flag.String("jwt-secret", getEnv("JWT_SECRET", ""), "Secret to encrypt JWT")
+	var verbose = flag.Bool("verbose", getEnvBool("VERBOSE", false), "Verbose")
 	var version = flag.Bool("version", false, "Show version")
-	var httpRouterName = flag.String("http-router-name", "HttpRouter", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
-	var statsdClientName = flag.String("statsd-client-name", "GoMetric", "Type of StatsD client. Allowed values are Cactus and GoMetric. Do not use in production.")
-	var profilerHTTPort = flag.Int("profiler-http-port", 0, "Start profiler localhost")
+	var httpRouterName = flag.String("http-router-name", getEnv("HTTP_ROUTER_NAME", "HttpRouter"), "Type of HTTP router")
+	var statsdClientName = flag.String("statsd-client-name", getEnv("STATSD_CLIENT_NAME", "GoMetric"), "Type of StatsD client")
+	var profilerHTTPort = flag.Int("profiler-http-port", getEnvInt("PROFILER_HTTP_PORT", 0), "Start profiler localhost")
 
-	// get flags
+	// Parse flags
 	flag.Parse()
 
-	// show version and exit
+	// Show version and exit
 	if *version {
 		fmt.Printf(
 			"StatsD HTTP Proxy v.%s, build %s from %s\n",
@@ -68,7 +59,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// log build version
+	// Log build version
 	log.Printf(
 		"Starting StatsD HTTP Proxy v.%s, build %s from %s\n",
 		Version,
@@ -76,22 +67,12 @@ func main() {
 		BuildDate,
 	)
 
-	// start profiler
+	// Start profiler
 	if *profilerHTTPort > 0 {
-		// enable block profiling
-		runtime.SetBlockProfileRate(1)
-
-		// start debug server
-		profilerHTTPAddress := fmt.Sprintf("localhost:%d", *profilerHTTPort)
-		go func() {
-			log.Println("Profiler started at " + profilerHTTPAddress)
-			log.Println("Open 'http://" + profilerHTTPAddress + "/debug/pprof/' in you browser or use 'go tool pprof http://" + profilerHTTPAddress + "/debug/pprof/heap' from console")
-			log.Println("See details about pprof in https://golang.org/pkg/net/http/pprof/")
-			log.Println(http.ListenAndServe(profilerHTTPAddress, nil))
-		}()
+		startProfiler(*profilerHTTPort)
 	}
 
-	// start proxy server
+	// Start proxy server
 	proxyServer := proxy.NewServer(
 		*httpHost,
 		*httpPort,
@@ -110,4 +91,47 @@ func main() {
 	)
 
 	proxyServer.Listen()
+}
+
+// Helper function to get an environment variable or return a default value
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+
+// Helper function to get an integer environment variable or return a default value
+func getEnvInt(key string, fallback int) int {
+	if value, ok := os.LookupEnv(key); ok {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
+	}
+	return fallback
+}
+
+// Helper function to get a boolean environment variable or return a default value
+func getEnvBool(key string, fallback bool) bool {
+	if value, ok := os.LookupEnv(key); ok {
+		if boolValue, err := strconv.ParseBool(value); err == nil {
+			return boolValue
+		}
+	}
+	return fallback
+}
+
+// Helper function to start the profiler
+func startProfiler(port int) {
+	// Enable block profiling
+	runtime.SetBlockProfileRate(1)
+
+	// Start debug server
+	profilerHTTPAddress := fmt.Sprintf("localhost:%d", port)
+	go func() {
+		log.Println("Profiler started at " + profilerHTTPAddress)
+		log.Println("Open 'http://" + profilerHTTPAddress + "/debug/pprof/' in your browser or use 'go tool pprof http://" + profilerHTTPAddress + "/debug/pprof/heap' from the console")
+		log.Println("See details about pprof in https://golang.org/pkg/net/http/pprof/")
+		log.Println(http.ListenAndServe(profilerHTTPAddress, nil))
+	}()
 }
