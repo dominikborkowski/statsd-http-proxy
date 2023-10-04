@@ -9,10 +9,18 @@ services:
     restart: unless-stopped
     read_only: true
     environment:
-      VERBOSE: ${VERBOSE:-true}
+      VERBOSE: ${VERBOSE:-true} # enable verbose output (console only)
       HTTP_PORT: ${HTTP_PORT:-8825}
-      JWT_SECRET: ${JWT_SECRET:-}
-      # JWT_SECRET: "whatever"
+      HTTP_HOST: ${HTTP_HOST:-127.0.0.1}
+      JWT_SECRET: ${JWT_SECRET:-} # if not specified, the proxy will accept any requests
       STATSD_HOST: ${STATSD_HOST:-127.0.0.1}
       STATSD_PORT: ${STATSD_PORT:-8125}
-
+      STATSD_CLIENT_NAME: ${STATSD_CLIENT_NAME:-GoMetric} # ype of StatsD client, only two options: GeoMetric (default) and Cactus
+      METRIC_PREFIX: ${METRIC_PREFIX:-} # metric name prefix
+      HTTP_ROUTER_NAME: ${HTTP_ROUTER_NAME:-HttpRouter} # GO HTTP router name: HttpRouter (default) or GorillaMux
+      HTTP_TIMEOUT_READ: ${HTTP_TIMEOUT_READ:-1} # read timeout in seconds
+      HTTP_TIMEOUT_WRITE: ${HTTP_TIMEOUT_WRITE:-1} # write timeout in seconds
+      HTTP_TIMEOUT_IDLE: ${HTTP_TIMEOUT_IDLE:-1} # idle timeout in seconds
+      TLS_CERT: ${TLS_CERT:-} # TLS certificate for HTTPS
+      TLS_KEY: ${TLS_KEY:-} # TLS private key for HTTPS
+      PROFILER_HTTP_PORT: ${PROFILER_HTTP_PORT:-} # port for HTTP profiler

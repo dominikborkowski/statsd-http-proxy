@@ -1,5 +1,5 @@
 ARG VERSION
-FROM golang:1.20-alpine as builder
+FROM golang:1.21-alpine as builder
 COPY . /source
 
 RUN apk add --no-cache --virtual .build-deps \
@@ -16,14 +16,12 @@ RUN apk add --no-cache --virtual .build-deps \
 RUN cd /source && \
     make build
 
-
-FROM alpine:3.17
+# golang:1.21-alpine is based on alpine 3.18
+FROM alpine:3.18
 
 # for heartbeat
 RUN apk add --no-cache netcat-openbsd curl
-
 COPY --from=builder /source/bin/statsd-http-proxy /usr/local/bin/
-
 
 # start service
 EXPOSE 8825
