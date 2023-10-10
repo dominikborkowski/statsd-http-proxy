@@ -24,3 +24,6 @@ src
 
 # module files
 vendor
+
+# env files
+.env

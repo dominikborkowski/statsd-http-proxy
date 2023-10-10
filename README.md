@@ -2,14 +2,14 @@
 
 StatsD HTTP proxy with REST interface for using in browsers
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/GoMetric/statsd-http-proxy?2)](https://goreportcard.com/report/github.com/GoMetric/statsd-http-proxy)
-[![Build Status](https://travis-ci.org/GoMetric/statsd-http-proxy.svg?branch=master)](https://travis-ci.org/GoMetric/statsd-http-proxy)
-[![Code Climate](https://codeclimate.com/github/GoMetric/statsd-http-proxy/badges/gpa.svg?1)](https://codeclimate.com/github/GoMetric/statsd-http-proxy)
-[![Coverage Status](https://coveralls.io/repos/github/GoMetric/statsd-http-proxy/badge.svg?branch=master)](https://coveralls.io/github/GoMetric/statsd-http-proxy?branch=master)
-
 StatsD uses UDP connections, and  can not be used directly from browser. This server is a HTTP proxy to StatsD, useful for sending metrics to StatsD from frontend by AJAX.
 
 Requests may be optionally authenticated using JWT tokens.
+
+## Changes from the upstream
+
+* Options can be set via environment variables
+* Enhanced docker examples
 
 ## Table of contents
 
@@ -91,7 +91,7 @@ server {
         server statsd-proxy-1:8825 max_fails=0;
         server statsd-proxy-2:8825 max_fails=0;
     }
-    
+
     location / {
         proxy_pass http://statsd_proxy;
         proxy_redirect off;
@@ -146,7 +146,7 @@ Command line arguments:
 | http-host       | Host of HTTP server                  | Optional. Default 127.0.0.1. To accept connections on any interface, set to ""    |
 | http-port       | Port of HTTP server                  | Optional. Default 80                                                              |
 | http-timeout-read | The maximum duration in seconds for reading the entire request, including the body | Optional. Defaults to 1 second |
-| http-timeout-write | The maximum duration in seconds before timing out writes of the respons | Optional. Defaults to 1 second  |
+| http-timeout-write | The maximum duration in seconds before timing out writes of the response | Optional. Defaults to 1 second  |
 | http-timeout-idle | The maximum amount of time in seconds to wait for the next request when keep-alives are enabled | Optional. Defaults to 1 second |
 | tls-cert        | TLS certificate for the HTTPS        | Optional. Default "" to use HTTP. If both tls-cert and tls-key set, HTTPS is used |
 | tls-key         | TLS private key for the HTTPS        | Optional. Default "" to use HTTP. If both tls-cert and tls-key set, HTTPS is used |
@@ -203,10 +203,10 @@ value=1&sampleRate=1
 
 ### Gauge
 
-Gauge is an arbitrary value. 
+Gauge is an arbitrary value.
 Only the last value during a flush interval is flushed to the backend. If the gauge is not updated at the next flush, it will send the previous value.
-Gauge also may be set relatively to previously stored value. 
-Is `shift` not passed, then `value` used. 
+Gauge also may be set relatively to previously stored value.
+Is `shift` not passed, then `value` used.
 If `value` not passed, used default value equals 1.
 To set a gauge to a negative number you need first set it to 0.
 
@@ -274,7 +274,7 @@ To start server run:
 ```
 nc -kluv localhost 8125
 ```
-To send comamnd to statsd, run:
+To send command to statsd, run:
 
 ```
 echo "counters" | nc localhost 8125
@@ -345,7 +345,7 @@ $ siege -R <(echo connection = keep-alive) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eX
 
 ### Results
 
-Concurent 255 users made 2000 requests each. Total request count: 510000
+Concurrent 255 users made 2000 requests each. Total request count: 510000
 
 | Router           | Keep alive | JWT      | Elapsed time | Transaction rate  | Concurrency |
 |------------------|------------|----------|--------------|-------------------|-------------|

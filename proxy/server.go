@@ -111,9 +111,9 @@ func NewServer(
 
 // Listen starts listening HTTP connections
 func (proxyServer *Server) Listen() {
-	// prepare for gracefull shutdown
-	gracefullStopSignalHandler := make(chan os.Signal, 1)
-	signal.Notify(gracefullStopSignalHandler, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	// prepare for graceful shutdown
+	gracefulStopSignalHandler := make(chan os.Signal, 1)
+	signal.Notify(gracefulStopSignalHandler, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// start HTTP/HTTPS proxy to StatsD
 	go func() {
@@ -137,9 +137,9 @@ func (proxyServer *Server) Listen() {
 		}
 	}()
 
-	<-gracefullStopSignalHandler
+	<-gracefulStopSignalHandler
 
-	// Gracefull shutdown
+	// Graceful shutdown
 	log.Printf("Stopping HTTP server")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
