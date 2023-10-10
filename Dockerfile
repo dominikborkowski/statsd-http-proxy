@@ -1,5 +1,8 @@
 ARG VERSION
 FROM golang:1.21-alpine as builder
+LABEL org.opencontainers.image.authors="dominik.borkowski@gmail.com"
+LABEL org.opencontainers.image.source="https://github.com/dominikborkowski/statsd-http-proxy"
+LABEL org.opencontainers.image.description="HTTP proxy for StatsD"
 COPY . /source
 
 RUN apk add --no-cache --virtual .build-deps \
